@@ -69,8 +69,35 @@ def dump_data_to_json_file(data_list, persistent_file):
     with open(persistent_file, 'w') as datafile:
         json.dump(data_list, datafile)
 
+def add_fixture_dets(quote_list):
+    '''
+    Adds model and key information to quotes so the persistent data can be used as a fixture for miNyl API.
+
+    Arguments:
+    quote_list(list) - A compilation of the quotes and authors store in dictionaries formatted as   {
+                                        "quote": "the quote text",
+                                        "author": "the attributed author and source"
+                                    }.
+
+    Returns:
+    quotes_fixture(list) - The argument data along with other key, value pairs that are needed for the fixture json.
+    '''
+    quotes_fixture = []
+    for count, quote in enumerate(quote_list, 1):
+        quotes_fixture.append({
+            "model": "miapi.Quote",
+            "pk": count,
+            "fields": {
+                "quote": quote['quote'],
+                "author": quote['author']
+            }
+        })
+    return quotes_fixture
+
+
 if __name__ == '__main__':
     for page in all_pages:
         scrape_page_rock_quotes(page, quotes_with_authors)
-    dump_data_to_json_file(quotes_with_authors, "quotes-data.json")
+    dump_data_to_json_file(add_fixture_dets(quotes_with_authors), "quotes-data.json")
+
 
